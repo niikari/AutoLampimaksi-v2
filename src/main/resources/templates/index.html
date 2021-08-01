@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="css/muoto.css">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous">
+
+<title>Auto Lämpimäksi</title>
+</head>
+<style>
+body {
+	font-family: "Times New Roman", Georgia, Serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Playfair Display";
+	letter-spacing: 5px;
+}
+
+li {
+	list-style-type: none;
+}
+
+#map {
+	height: 600px;
+	width: 100%;
+}
+
+#tulos {
+	margin-top: 1em;
+}
+
+#flash {
+	margin: auto;
+	text-align: center;
+	background-color: white;
+	opacity: 0.8;
+}
+
+.logged {
+	display: flex;
+	
+}
+
+</style>
+<body>
+
+	<!-- Navigaatio -->
+	
+	<div class="w3-top" id="home">
+		<div class="w3-bar w3-white w3-padding w3-card"
+			style="letter-spacing: 4px;">
+			<a href="#map" class="w3-bar-item w3-button">Auto Lämpimäksi</a>
+			<!-- Right-sided navbar links. Hide them on small screens -->
+			<div class="w3-right w3-hide-small">
+			
+				<a href="#about" class="w3-bar-item w3-button">About</a> <a
+					href="#haku" class="w3-bar-item w3-button">Haku</a> <a
+					href="#rekisteroidy" class="w3-bar-item w3-button">Palveluntarjoajat</a>
+					<a sec:authorize="isAnonymous()" href="/login" class="w3-bar-item w3-button">Kirjaudu</a>
+					<a sec:authorize="isAuthenticated()" href="/logout" class="w3-bar-item w3-button">Kirjaudu ulos</a>
+			</div>
+		</div>
+		<p id="flash" class="w3-bar-item w3-button"><b><span th:text="${message}">Flash viesti</span></b></p>
+		
+		
+	</div>
+
+	<!-- JOS EI KIRJAUTUNUT NIIN NÄKYY KARTTA -->
+	<div id="map" sec:authorize="isAnonymous()"></div>
+	<!-- JOS KIRJAUTUNEENA ASIAKAS NIIN NÄKYY ASIAKASNÄKYMÄ -->
+	
+	
+
+	<!-- Page content -->
+	<div class="w3-content" style="max-width: 1100px">
+		<div class="logged" sec:authorize="hasAuthority('enterprise')"><p>korjaamo</p></div>
+		<div class="logged" sec:authorize="hasAuthority('customer')">
+			<div class="w3-container w3-padding-64" id="contact">
+			<h3>Sinulle merkityt autot</h3>
+			<ul>
+				<li th:each="car : ${cars}">
+				<div class="card" style="width: 18rem;">
+					<img src="https://www.extremetech.com/wp-content/uploads/2019/12/SONATA-hero-option1-764A5360-edit-768x425.jpg" class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title" th:text="${car.plate}">Car Plate</h5>
+						<p class="card-text">Merkki: <span th:text="${car.make}"></span><br>Malli: <span th:text="${car.model}"></span><br>
+						Vuosimalli: <span th:text="${car.modyear}">Car vuosimalli</span></p>
+					</div>
+				</div>
+				</li>
+			</ul>
+		</div>
+
+	<!--  TULEVAT VARAUKSET -->
+	
+	<div class="w3-container w3-padding-64" id="contact">
+			<h3>Varauksesi</h3>
+			<ul>
+				<li th:each="booking : ${bookings}">
+				<div class="card" style="width: 18rem;">
+					<img src="https://autofit.fi/sites/default/files/hynynen_0.jpg" class="card-img-top" alt="...">
+					<div class="card-body">
+						<h5 class="card-title" th:text="${booking.offer.enterprise.name}">Yritys jolle varattu</h5>
+						<p class="card-text">Ajavaraus tehty päivälle: <span th:text="${booking.bookedDate}"></span></p>
+						<a href="#" class="btn btn-primary">Anna arviointisi yritykselle käyntisi perusteella</a>
+					</div>
+				</div>
+				</li>
+			</ul>
+		</div>
+		</div>
+
+
+
+
+		<p id="err" th:text="${nameerror}"></p>
+
+
+
+		<!-- About Section -->
+		<div class="w3-row w3-padding-64" id="about">
+			<div class="w3-col m6 w3-padding-large w3-hide-small">
+				<img
+					src="https://productimages.biltema.com/v1/Image/product/xlarge/2000033709/3"
+					class="w3-round w3-image w3-opacity-min" alt="Table Setting"
+					width="600" height="750">
+			</div>
+
+			<div class="w3-col m6 w3-padding-large">
+				<h1 class="w3-center">Tietoa meistä</h1>
+				<br>
+				<h5 class="w3-center">Helpoin tapa asentaa sopiva lämmitys!</h5>
+				<p class="w3-large">Mietitko mitä autoon asennettavan sisälämmityksen asentaminen maksaa ja missä sen tekeminen 
+				onnistuisi? Nyt olemme tehneet tämän sinulle helpoksi! Annat vain autosi rekisterinumeron ja valitset sopivan
+				asennuspaikan. Edistynyt ohjelmamme laskee sinulle hinnan ja ilmoittaa koska kyseinen asennuspiste asennuksen
+				voi suorittaa. Tämän jälkeen varaat vain ajan. Nopeampaa kuin kahvin keittäminen. </p><br>
+				<p class="w3-large">Ohjelman on tehnyt pari Haaga-Helian opiskelijaa kurssin ohella. Kyseessä on beta-versio,
+				tarkoitus on vain näyttää, että tämän tekeminen on mahdollista!</p>
+			</div>
+		</div>
+
+		<hr>
+
+		<!-- Menu Section -->
+		<div class="w3-row w3-padding-64" id="haku">
+			<div class="w3-col l6 w3-padding-large">
+				<h1 class="w3-center"></h1>
+				<br>
+				<h4>Hae rekisterinumerolla</h4>
+				<p class="w3-large">Syötä alle autosti rekisterinumero ja saat tuloksena autollesi sopivan lämmityksen, hinnan sekä asennuspisteen</p>
+				<br>
+				
+				
+				
+				
+		
+<input id="mySearchField" name="search" placeholder="Syötä rekisterikilpi.." type="text">
+
+  <input type="submit" id="Form_Go" class="Button" onclick="rekisteriHaku()" value="Hae">
+
+
+  <div id="tulos"></div>
+
+
+			</div>
+
+			<div class="w3-col l6 w3-padding-large">
+				<img
+					src="https://assets.apu.fi/vqd9tl2q3uk2/8742-rekisterikilpi_petri_mulari_a_lehtien_arkisto/271ce19b19b7f30c856435313e538c57/rekisterikilpi_petri_mulari_a_lehtien_arkisto_vtvyn.jpg?w=655&h=655&fit=crop-center&q=75"
+					class="w3-round w3-image w3-opacity-min" alt="Menu"
+					style="width: 100%">
+			</div>
+		</div>
+
+		<hr>
+
+		<!-- Contact Section -->
+		<div class="w3-container w3-padding-64" id="rekisteroidy"
+			th:action="@{/addnewenterprise}" th:object="${enterprise}"
+			method="POST">
+			<h1>Rekisteröidy mukaan!</h1>
+			<br>
+			<p>Haluatteko, että lisäämme teidät palveluntarjoajiin.</p>
+			<p class="w3-text-blue-grey w3-large">
+				<b>Dragon Flame Oy</b>
+			</p>
+			<p>Liittyminen on nopeaa ja helppoa!</p>
+			<p><b>Olet jo mukana? Kirjaudu siis sisään</b></p>
+			<!--  
+			<form th:action="@{/addnewenterprise}" th:object="${enterprise}"
+				method="POST">
+				<p>
+					<input class="w3-input w3-padding-16" type="text"
+						th:field="*{name}" placeholder="Mönttösen asennuspiste Oy">
+				</p>
+				<p>
+					<input class="w3-input w3-padding-16" type="text"
+						th:field="*{address}" placeholder="Katusosoite">
+				</p>
+				<p>
+					<input class="w3-input w3-padding-16" type="text"
+						th:field="*{postCode}" placeholder="Postinumero">
+				</p>
+				<p>
+					<input class="w3-input w3-padding-16" type="text"
+						placeholder="Kaupunki" th:field="*{city}">
+				</p>
+				-->
+				<p>
+					<a href="/rekisterointi" class="w3-button w3-light-grey w3-section" type="submit">Rekisteröidy</a>
+					<a href="/login" class="w3-button w3-light-grey w3-section" type="submit">Kirjaudu</a>
+				</p>
+			</form>
+		</div>
+
+		<!-- End page content -->
+		<div class="w3-container w3-padding-64" id="contact">
+			<h3>Mukana tarjoamassa asennuksia:</h3>
+			<ul>
+				<li th:each="yritys : ${yritykset}">
+					<div class="card w-75">
+						<div class="card-body">
+							<h5 class="card-title" th:text="${yritys.name}"></h5>
+							<p class="card-text"><b><span th:text="${yritys.city}"></span></b></p>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<!-- Footer -->
+		<footer class="w3-center w3-light-grey w3-padding-32">
+			<p>Jos halutaan vielä footer - halutaanhan me :)</p>
+		</footer>
+
+
+
+		<!-- <div class="card w-75">
+  <div class="card-body">
+    <h5 class="card-title">Card title</h5>
+    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <a href="#" class="btn btn-primary">Button</a>
+  </div>
+</div> -->
+
+
+
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+		crossorigin="anonymous"></script>
+
+	<script th:src="@{/js/script.js}"></script>
+
+	<script async
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBEdh7HpK05qAm0kRzYeV3YNH3PynQdkxE&callback=initMap">
+</script>
+</body>
+</html>
+
